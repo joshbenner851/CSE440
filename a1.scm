@@ -12,6 +12,7 @@
 		)
 	)
 )
+;hi
 
 (define (permutation s)
 	(grabFirst s s)
