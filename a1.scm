@@ -3,12 +3,87 @@
 ;Spring 2016
 ;AI Dekai
 
+; returns a list with the removed element
+(define (remove l bef aft curr seq)
+	; (print "before: " bef)
+	; (print "after: " aft)
+	; (print "curr: " curr)
+	; (print "seq: " seq)
+	(set! curr (list(car seq)))
+	;if the sequence is empty we're finished
+	(if (equal? seq '())
+		(print "finished")
+		(begin
+			;initialize the after sequence
+			(if (equal? aft '())
+				(define aft (cdr seq))
+				; (print "declare after: " aft)
+			)
+			; if the letter is equal to current
+			(if (equal? l curr) 
+				;print the list w/o the element
+				(append bef aft)
+				(begin
+					;l is constant, letter we're removing
+					;bef adds the previous letter
+					;aft loses it's first letter
+					;curr shifts to the right 1 letter each iteration
+					;seq moves 1 letter to the right
+					(remove l (append curr bef) (cdr aft) curr (cdr seq) )
+				)	
+			)
+		)
+	)
+)
+
+(define dictionary '(a act ale at ate cat eat etc tea))
+
+;n = current sequence that's being modified as we go
+;orig = very original sequence that stays constant
 (define (grabFirst n orig)
 	(if (equal? n '())
 		(print "#f")
 		(begin
-			( print (append (list(car n)) (remove (list(car n)) '() '() '() orig ) ) )
+			;;we need to recurse here on 
+			;the sub strings to get all possibilites
+			;ONLY NEED THIS FOR ANAGRAM NOT PERMUTE
+			;;THIS WORKS BUT WE"RE NOT CHECKING ALL PERMUTATIONS YET SO UNCOMMENT IT ONCE
+			;THAT IS DONE
+			; (if (equal? #t (checkDict dictionary (append 
+			; 			(list(car n)) 
+			; 			(remove (list(car n)) '() '() '() orig )) 
+			; 	))
+			; 	(print "valid: " (append 
+			; 			(list(car n)) 
+			; 			(remove (list(car n)) '() '() '() orig )))
+			; )
+			;COMMENT THIS OUT ONCE DONE
+			( print (append 
+						(list(car n)) 
+						(remove (list(car n)) '() '() '() orig ) 
+					) 
+			)
 			(grabFirst (cdr n) orig)
+		)
+	)
+)
+
+; (define (forloop )
+
+; )
+
+(define (perm n orig)
+	(if (equal? n '())
+		#f
+		(begin
+			;;we need to recurse here on 
+			;the sub strings to get all possibilites
+			
+			(perm (cdr n) orig)
+			(append 
+						(list(car n)) 
+						(remove (list(car n)) '() '() '() orig ) 
+					)
 		)
 	)
 )
@@ -17,7 +92,6 @@
 (define (permutation s)
 	(grabFirst s s)
 )
-
 
 (define (recurse s)
 	(if (equal? s '())
@@ -77,13 +151,21 @@
 	)
 )
 
+; (define (permuteAlt a)
+; 	;Check if empty list 
+; 	(if (equal? (length a) 0) #f)
+; 	(if (equal? (length a) 1)
+; 		a
+; 	)
+; )
 
-
-(define (permuteAlt a)
-	;Check if empty list 
-	(if (equal? (length a) 0) #f)
-	(if (equal? (length a) 1)
-		a
+;The input format differs from the dictionary so we need to convert it to the dict format
+;initially rest = ""
+;seq = the original sequence we need to convert from '(x y z) to '(xyz) 
+(define (fixformat seq rest)
+	(if (equal? seq '())
+		(list(string->symbol rest))
+		(fixformat (cdr seq) (string-append rest (symbol->string (car seq))  ))
 	)
 )
 
@@ -92,12 +174,14 @@
 		#f
 		(begin
 			; need to get the permutation and set as a			
-			(if (equal? (list(car dict)) (permuteAlt word) )
+			(if (equal? (list(car dict)) (fixformat word "")) ;)(permuteAlt 
 				;(print "valid: " (permuteAlt word))
 				#t
 				(begin
+					;(print (list(car dict)) (fixformat word ""))
 					;(print "invalid: " a)
-					(anagram (cdr dict) word)
+					;(print "cdr: " (cdr dict) " word: " word)
+					(checkDict (cdr dict) word)
 				)
 			) 
 		)
@@ -107,7 +191,7 @@
 ; Accepts two lists
 ;dict = dictionary we're using as all valid sequences
 ;a = sequence we're finding permutations of and checking if valid
-(define (anagram dict a)
+(define (anagram dict word)
 	;(print dict)
 	;for loop through dictionary
 	;a is anagram
@@ -115,55 +199,25 @@
 
 	;Check if it's a valid word
 	;valid = if in dictionary
-	(if (equal? dict '() )
-		(print "#f")
-
-		(begin
-			; need to get the permutation and set as a			
-			(if (equal? (list(car dict)) (permuteAlt a) )
-				(print "valid: " (permuteAlt a))
-				(begin
-					;(print "invalid: " a)
-					(anagram (cdr dict) a)
-				)
-			) 
-		)
-	)
-	; (print "#f")
 	
-)
-
-; returns a list with the removed element
-(define (remove l bef aft curr seq)
-	; (print "before: " bef)
-	; (print "after: " aft)
-	; (print "curr: " curr)
-	; (print "seq: " seq)
-	(set! curr (list(car seq)))
-	;if the sequence is empty we're finished
-	(if (equal? seq '())
-		(print "finished")
-		(begin
-			;initialize the after sequence
-			(if (equal? aft '())
-				(define aft (cdr seq))
-				; (print "declare after: " aft)
-			)
-			; if the letter is equal to current
-			(if (equal? l curr) 
-				;print the list w/o the element
-				(append bef aft)
-				(begin
-					;l is constant, letter we're removing
-					;bef adds the previous letter
-					;aft loses it's first letter
-					;curr shifts to the right 1 letter each iteration
-					;seq moves 1 letter to the right
-					(remove l (append curr bef) (cdr aft) curr (cdr seq) )
-				)	
-			)
-		)
+	(if (equal? #t (checkDict dict word))
+		(print word)
 	)
+	; (if (equal? dict '() )
+	; 	(print "#f")
+
+	; 	(begin
+	; 		; need to get the permutation and set as a			
+	; 		(if (equal? (list(car dict)) (permuteAlt a) )
+	; 			(print "valid: " (permuteAlt a))
+	; 			(begin
+	; 				;(print "invalid: " a)
+	; 				(anagram (cdr dict) a)
+	; 			)
+	; 		) 
+	; 	)
+	; )
+	; (print "#f")
 )
 
 (define (rewrite l bef aft seq)
@@ -189,8 +243,7 @@
 		(else 
 			(print "fml")
 		) 
-	)
-	
+	)	
 )
 
 (define (test a)
@@ -215,6 +268,21 @@
 ; 	)
 
 ; )
+
+; (if (equal? act (fixformat '(a c t) ""))
+; 	(print "#t")
+; 	(print "#f")
+; )
+
+
+; (if (equal? #t (checkDict dictionary (append 
+; 						(list(car '(t e a))) 
+; 						(remove (list(car '(t e a))) '() '() '() '(t e a) )) 
+; 				))
+; 				(print "valid: " (append 
+; 						(list(car '(t e a))) 
+; 						(remove (list(car '(t e a))) '() '() '() '(t e a) )))
+; 			)
 
 ; (define (deleteItem item list) 
 ;   (cond((empty? list) '())
