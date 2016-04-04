@@ -4,6 +4,11 @@
 ;AI Dekai
 
 ; returns a list with the removed element
+; l = letter we want to remove
+; bef = the sublist before the letter
+; aft = the sublist after the letter
+; curr = the current letter we're looping through to check if it's the desired letter
+; seq = original sequence that stays constant
 (define (remove l bef aft curr seq)
 	; (print "before: " bef)
 	; (print "after: " aft)
@@ -40,37 +45,35 @@
 
 ;n = current sequence that's being modified as we go
 ;orig = very original sequence that stays constant
-(define (grabFirst n orig)
+(define (grabFirst n orig bool dict)
 	(if (equal? n '())
 		(print "#f")
 		(begin
-			;;we need to recurse here on 
+			;;TO DO: we need to recurse here on 
 			;the sub strings to get all possibilites
-			;ONLY NEED THIS FOR ANAGRAM NOT PERMUTE
-			;;THIS WORKS BUT WE"RE NOT CHECKING ALL PERMUTATIONS YET SO UNCOMMENT IT ONCE
-			;THAT IS DONE
-			; (if (equal? #t (checkDict dictionary (append 
-			; 			(list(car n)) 
-			; 			(remove (list(car n)) '() '() '() orig )) 
-			; 	))
-			; 	(print "valid: " (append 
-			; 			(list(car n)) 
-			; 			(remove (list(car n)) '() '() '() orig )))
-			; )
-			;COMMENT THIS OUT ONCE DONE
-			( print (append 
+			(if (equal? bool #t)
+				(if (equal? #t (checkDict dict (append 
+							(list(car n)) 
+							(remove (list(car n)) '() '() '() orig )) )
+						)
+						(print (append 
+								(list(car n)) 
+								(remove (list(car n)) '() '() '() orig ))
+						)
+				)
+				(begin
+					;(grabFirst (remove (list(car n)) '() '() '() orig ) (remove (list(car n)) '() '() '() orig ) #f '())
+					;(print "need to permute: " (remove (list(car n)) '() '() '() orig ))
+					( print (append 
 						(list(car n)) 
-						(remove (list(car n)) '() '() '() orig ) 
-					) 
+						(remove (list(car n)) '() '() '() orig ) ) 
+					)
+				)
 			)
-			(grabFirst (cdr n) orig)
+			(grabFirst (cdr n) orig bool dict)
 		)
 	)
 )
-
-; (define (forloop )
-
-; )
 
 (define (perm n orig)
 	(if (equal? n '())
@@ -89,8 +92,8 @@
 )
 ;hi
 
-(define (permutation s)
-	(grabFirst s s)
+(define (permute s)
+	(grabFirst s s #f '())
 )
 
 (define (recurse s)
@@ -127,7 +130,7 @@
 ; permute '(e) '(a) '() '()
 ; permute '(a) '(e) '() '()
 
-(define (permute bf l af seq)
+(define (permut3 bf l af seq)
 	(define before '())
 	;(print "before: " before)
 	(define letter (list(car seq)))
@@ -146,7 +149,7 @@
 	(if (equal? (length (car(cdr seq))) 1)
 		(print "hi")
 		(begin
-			(permute (cdr seq))
+			(permut3 (cdr seq))
 		)
 	)
 )
@@ -169,6 +172,9 @@
 	)
 )
 
+;Checks the dictionary given if the word is valid
+; dict = dictionary provided // list of symbols compacted
+; word = word we're checking // list of symbols expanded
 (define (checkDict dict word)
 	(if (equal? dict '() )
 		#f
@@ -188,9 +194,10 @@
 	)
 )
 
-; Accepts two lists
-;dict = dictionary we're using as all valid sequences
-;a = sequence we're finding permutations of and checking if valid
+; Finds all the valid Anagrams of the given word
+; valid = in the dictionary
+; dict = dictionary we're using as all valid sequences
+; word  = sequence we're finding permutations of and checking if valid
 (define (anagram dict word)
 	;(print dict)
 	;for loop through dictionary
@@ -199,10 +206,7 @@
 
 	;Check if it's a valid word
 	;valid = if in dictionary
-	
-	(if (equal? #t (checkDict dict word))
-		(print word)
-	)
+	(grabFirst word word #t dict)
 	; (if (equal? dict '() )
 	; 	(print "#f")
 
@@ -269,21 +273,6 @@
 
 ; )
 
-; (if (equal? act (fixformat '(a c t) ""))
-; 	(print "#t")
-; 	(print "#f")
-; )
-
-
-; (if (equal? #t (checkDict dictionary (append 
-; 						(list(car '(t e a))) 
-; 						(remove (list(car '(t e a))) '() '() '() '(t e a) )) 
-; 				))
-; 				(print "valid: " (append 
-; 						(list(car '(t e a))) 
-; 						(remove (list(car '(t e a))) '() '() '() '(t e a) )))
-; 			)
-
 ; (define (deleteItem item list) 
 ;   (cond((empty? list) '())
 ;     ((equal? item (car list)) (cdr list))
@@ -291,17 +280,6 @@
 
 
 ;(append (car dictionary) '()) '(a) )
-
-; No clue how this is different then line 47
-; (define (checkValid a b)
-; 	(if (equal? a b)
-; 		#t
-; 		(begin
-; 			#f
-; 		)
-; 	)
-; )
-
 
 ; iterative approach
 ; recurse(s)
