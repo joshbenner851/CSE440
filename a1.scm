@@ -41,13 +41,12 @@
 	)
 )
 
-(define dictionary '(a act ale at ate cat eat etc tea))
 
 ;n = current sequence that's being modified as we go
 ;orig = very original sequence that stays constant
-(define (grabFirst n orig bool dict)
+(define (grabFirst n orig bool dict bool2)
 	(if (equal? n '())
-		(print "#f")
+		(print "#f \nDekai and Meriem are awesome")
 		(begin
 			;;TO DO: we need to recurse here on 
 			;the sub strings to get all possibilites
@@ -64,13 +63,24 @@
 				(begin
 					;(grabFirst (remove (list(car n)) '() '() '() orig ) (remove (list(car n)) '() '() '() orig ) #f '())
 					;(print "need to permute: " (remove (list(car n)) '() '() '() orig ))
-					( print (append 
+					(if (equal? bool2 #t)
+						(begin (print "n: " n)
+							(append 
 						(list(car n)) 
-						(remove (list(car n)) '() '() '() orig ) ) 
+						;grabFirst remove remove bool dict
+						(grabFirst (remove (list(car n)) '() '() '() orig )   (remove (list(car n)) '() '() '() orig )  bool dict #t))
+						)
+						( print (append 
+						(list(car n)) 
+						;grabFirst remove remove bool dict
+						(grabFirst (remove (list(car n)) '() '() '() orig )   (remove (list(car n)) '() '() '() orig )  bool dict #t))
+						;(remove (list(car n)) '() '() '() orig ) ) 
+						)
 					)
+					
 				)
 			)
-			(grabFirst (cdr n) orig bool dict)
+			(grabFirst (cdr n) orig bool dict bool2)
 		)
 	)
 )
@@ -93,7 +103,7 @@
 ;hi
 
 (define (permute s)
-	(grabFirst s s #f '())
+	(grabFirst s s #f '() #f)
 )
 
 (define (recurse s)
